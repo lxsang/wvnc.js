@@ -6,7 +6,7 @@ Since the **wvnc** plugin offers data compression using JPEG and Zlib, **wvnc.js
 
 A prebuild version of **wvnc.js** is available in the **build** folder:
 * **wvnc.js**:  main API class
-* **decode.js**: used by web worker to decode compression data in the background
+* **decoder.js**: used by web worker to decode compression data in the background
 * **wvnc_asm.\***: web assembly version of the decoder API using libjeg and zlib
 
 ## Build from source
