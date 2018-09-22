@@ -12,7 +12,7 @@ A prebuild version of **wvnc.js** is available in the **build** folder:
 ## Build from source
 ### Dependencies
 * Coffee script
-* EMSDK for web assembly tool chain [https://github.com/juj/emsdk](https://github.com/juj/emsdk)
+* EMSDK tool chain for web assembly [https://github.com/juj/emsdk](https://github.com/juj/emsdk)
 
 ### Build
 Since the decoder relies on **libjpeg** and **zlib**, execute following command to fetch and build these libraries using emsdk tool chain:
