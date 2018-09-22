@@ -23,7 +23,7 @@ emmake make
 #emcmake cmake ../
 #emmake make
 cd ../
-echo "Preparinf Zlib..."
+echo "Preparing Zlib..."
 wget https://zlib.net/zlib-1.2.11.tar.gz
 mkdir zlib
 tar xvzf zlib-1.2.11.tar.gz -C ./zlib --strip-components=1
