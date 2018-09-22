@@ -1,6 +1,6 @@
 # wvnc.js
 
-**wvnc.js** is the client side protocol API for my [Antd's **wvnc**](https://github.com/lxsang/antd-wvnc-plugin) server side plugin. It allows to remote acess to VNC server from the web using websocket (via the **wvnc** server plugin).
+**wvnc.js** is the client side protocol API for my [Antd's **wvnc**](https://github.com/lxsang/antd-wvnc-plugin) server side plugin. It allows to acess to VNC server from the web using websocket (via the **wvnc** server plugin).
 
 Since the **wvnc** plugin offers data compression using JPEG and Zlib, **wvnc.js** uses **web assembly** and **web worker** to speed up the data decoding process, thus speed up the remote screen rendering on HTML canvas.
 
