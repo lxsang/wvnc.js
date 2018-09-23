@@ -12,6 +12,7 @@ A prebuild version of **wvnc.js** is available in the **build** folder:
 ## Build from source
 ### Dependencies
 * Coffee script
+* uglifyjs
 * EMSDK tool chain for web assembly [https://github.com/juj/emsdk](https://github.com/juj/emsdk)
 
 ### Build
