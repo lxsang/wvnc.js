@@ -36,7 +36,6 @@ class WVNC
             me.sendPointEvent p.x, p.y, me.mouseMask
 
         return unless me.canvas
-        me.canvas.style.cursor = "none"
         me.canvas.oncontextmenu = (e) ->
             e.preventDefault()
             return false
@@ -111,18 +110,22 @@ class WVNC
                 return
             me.sendPointEvent p.x, p.y, 16
             me.sendPointEvent p.x, p.y, 0
-        ###
-        hamster = Hamster @canvas
-        hamster.wheel (event, delta, deltaX, deltaY) ->
-            p = getMousePos event.originalEvent
-            event.originalEvent.preventDefault()
-            if delta > 0
-                me.sendPointEvent p.x, p.y, 8
-                me.sendPointEvent p.x, p.y, 0
-                return
-            me.sendPointEvent p.x, p.y, 16
-            me.sendPointEvent p.x, p.y, 0
-        ###
+        # paste event
+        @canvas.onpaste = (e) ->
+            pastedText = undefined
+            if window.clipboardData and window.clipboardData.getData  #IE
+                pastedText = window.clipboardData.getData 'Text'
+            else if e.clipboardData and e.clipboardData.getData
+                pastedText = e.clipboardData.getData 'text/plain'
+            return false unless pastedText
+            e.preventDefault()
+            @sendTextAsClipboard pastedText
+        # global event
+        fn = (e) ->
+            console.log "unload"
+            me.socket.close() if me.socket
+        window.addEventListener "unload", fn
+        window.addEventListener "beforeunload", fn
 
     initCanvas: (w, h , d) ->
         me = @
@@ -134,6 +137,7 @@ class WVNC
             h: h,
             depth: @depth
         @decoder.postMessage @resolution
+        me.canvas.style.cursor = "none"
         @setScale @scale
 
     process: (msg) ->
@@ -169,6 +173,8 @@ class WVNC
             me.consume e
         @socket.onclose = () ->
             me.socket = null
+            me.canvas.style.cursor = "auto"
+            me.canvas.getContext('2d').clearRect 0,0, me.resolution.w, me.resolution.h if me.canvas
             console.log "socket closed"
 
     disconnect: () ->

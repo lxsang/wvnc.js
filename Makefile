@@ -29,7 +29,7 @@ asm:
 	-O3 -s ALLOW_MEMORY_GROWTH=1  -s WASM=1 -s NO_EXIT_RUNTIME=1 -s \
 	'EXTRA_EXPORTED_RUNTIME_METHODS=["cwrap"]' 
 
-install:
+install: js asm
 	cp $(BUILDDIR)/* $(INSTALLDIR)
 
 clean:
