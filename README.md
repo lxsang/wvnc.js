@@ -1,6 +1,8 @@
 # wvnc.js
 
-**wvnc.js** is the client side protocol API for my [Antd's **wvnc**](https://github.com/lxsang/antd-wvnc-plugin) server side plugin. It allows to acess to VNC server from the web using websocket (via the **wvnc** server plugin).
+Overview about WVNC: [https://blog.lxsang.me/r/id/23](https://blog.lxsang.me/r/id/23)
+
+**wvnc.js** is the client side protocol API for my [Antd's **wvnc**](https://github.com/lxsang/antd-wvnc-plugin) server side plugin. It allows to acess VNC server from the web using websocket (via the **wvnc** server plugin).
 
 Since the **wvnc** plugin offers data compression using JPEG and Zlib, **wvnc.js** uses **web assembly** and **web worker** to speed up the data decoding process, thus speed up the screen rendering on HTML canvas.
 
@@ -8,6 +10,9 @@ A prebuild version of **wvnc.js** is available in the **build** folder:
 * **wvnc.js**:  main API class
 * **decoder.js**: used by web worker to decode compressed data in the background
 * **wvnc_asm.\***: web assembly version of the decoder API using libjeg and zlib
+
+## Demo
+A demo of a web based VNC client using the library is available at: [https://apps.lxsang.me/webVNC](https://apps.lxsang.me/webVNC)
 
 ## Build from source
 ### Dependencies
