@@ -119,7 +119,7 @@ class WVNC
                 pastedText = e.clipboardData.getData 'text/plain'
             return false unless pastedText
             e.preventDefault()
-            @sendTextAsClipboard pastedText
+            me.sendTextAsClipboard pastedText
         # global event
         fn = (e) ->
             console.log "unload"
