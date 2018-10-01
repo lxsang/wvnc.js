@@ -174,11 +174,11 @@ class WVNC
         @socket.onclose = () ->
             me.socket = null
             me.canvas.style.cursor = "auto"
-            me.canvas.getContext('2d').clearRect 0,0, me.resolution.w, me.resolution.h if me.canvas
+            me.canvas.getContext('2d').clearRect 0,0, me.resolution.w, me.resolution.h if me.canvas and me.resolution
             console.log "socket closed"
 
     disconnect: () ->
-        @socket.close()
+        @socket.close() if @socket
 
     initConnection: (vncserver, params) ->
         #vncserver = "192.168.1.20:5901"
@@ -254,6 +254,9 @@ class WVNC
         return new Promise (resolve, reject) ->
             reject("oncredential is not implemented")
 
+    onerror: (m) ->
+         console.log "Error", m
+
     consume: (e) ->
         data = new Uint8Array e.data
         cmd = data[0]
@@ -262,7 +265,7 @@ class WVNC
             when 0xFE #error
                 data = data.subarray 1, data.length - 1
                 dec = new TextDecoder("utf-8")
-                console.log "Error", dec.decode(data)
+                @onerror dec.decode(data)
             when 0x81
                 console.log "Request for password"
                 @onpassword().then (pass) ->
