@@ -10,6 +10,7 @@ class WVNC
         @canvas = document.getElementById @canvas if typeof @canvas is 'string'
         worker = args.worker if args.worker
         @decoder = new Worker worker
+        @enableEvent = true
         me = @
         @mouseMask = 0
         @decoder.onmessage = (e) ->
@@ -32,6 +33,7 @@ class WVNC
             return pos
 
         sendMouseLocation = (e) ->
+            return unless me.enableEvent
             p = getMousePos e
             me.sendPointEvent p.x, p.y, me.mouseMask
 
@@ -101,6 +103,7 @@ class WVNC
 
         # mouse wheel event
         @canvas.addEventListener 'wheel', (e) ->
+            return unless me.enableEvent
             #if (e.deltaY < 0) # up
             p = getMousePos e
             e.preventDefault()
@@ -112,6 +115,7 @@ class WVNC
             me.sendPointEvent p.x, p.y, 0
         # paste event
         @canvas.onpaste = (e) ->
+            return unless me.enableEvent
             pastedText = undefined
             if window.clipboardData and window.clipboardData.getData  #IE
                 pastedText = window.clipboardData.getData 'Text'
@@ -213,12 +217,13 @@ class WVNC
         @socket.send( @buildCommand 0x05, data )
 
     sendKeyEvent: (code, v) ->
+        console.log code, v
         return unless @socket
+        return unless @enableEvent
         data = new Uint8Array 3
         data[0] = code & 0xFF
         data[1] = code >> 8
         data[2] = v
-        console.log code, v
         @socket.send( @buildCommand 0x06, data )
 
     buildCommand: (hex, o) ->
@@ -257,6 +262,9 @@ class WVNC
     onerror: (m) ->
          console.log "Error", m
 
+    onresize: () ->
+        console.log "resize"
+
     consume: (e) ->
         data = new Uint8Array e.data
         cmd = data[0]
@@ -268,24 +276,28 @@ class WVNC
                 @onerror dec.decode(data)
             when 0x81
                 console.log "Request for password"
+                @enableEvent = false
                 @onpassword().then (pass) ->
                     me.socket.send (me.buildCommand 0x02, pass)
+                    me.enableEvent = true
             when 0x82
                 console.log "Request for login"
+                @enableEvent = false
                 @oncredential().then (user, pass) ->
                     arr = new Uint8Array user.length + pass.length + 1
                     arr.set (new TextEncoder()).encode(user), 0
                     arr.set ['\0'], user.length
                     arr.set (new TextEncoder()).encode(pass), user.length + 1
                     me.socket.send(me.buildCommand 0x03, arr)
+                    me.enableEvent = true
             when 0x83
-                console.log "resize"
                 w = data[1] | (data[2]<<8)
                 h = data[3] | (data[4]<<8)
                 depth = data[5]
                 @initCanvas w, h, depth
                 # status command for ack
                 @socket.send(@buildCommand 0x04, 1)
+                @onresize()
             when 0x84
                 # send data to web assembly for decoding
                 @decoder.postMessage data.buffer, [data.buffer]
