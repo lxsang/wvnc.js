@@ -19,6 +19,8 @@ class WVNC
         me = @
         return new Promise (r, e) ->
             return e('Canvas is not set') if not me.canvas
+            # fix keyboard event problem
+            $(me.canvas).attr 'tabindex', '1'
             me.initInputEvent()
             r()
 
@@ -217,7 +219,7 @@ class WVNC
         @socket.send( @buildCommand 0x05, data )
 
     sendKeyEvent: (code, v) ->
-        console.log code, v
+        #console.log code, v
         return unless @socket
         return unless @enableEvent
         data = new Uint8Array 3
