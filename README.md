@@ -11,9 +11,6 @@ A prebuild version of **wvnc.js** is available in the **build** folder:
 * **decoder.js**: used by web worker to decode compressed data in the background
 * **wvnc_asm.\***: web assembly version of the decoder API using libjeg and zlib
 
-## Demo
-A demo of a web based VNC client using the library is available at: [https://apps.lxsang.me/webVNC](https://apps.lxsang.me/webVNC)
-
 ## Build from source
 ### Dependencies
 * Coffee script
