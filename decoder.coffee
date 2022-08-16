@@ -3,6 +3,7 @@ importScripts('wvnc_asm.js')
 api = {}
 resolution = undefined
 #frame_buffer = undefined
+#timeout = undefined
 Module.onRuntimeInitialized = () ->
     api =
     {
@@ -22,8 +23,9 @@ wasm_update = (msg) ->
     p = api.createBuffer datain.length
     Module.HEAP8.set datain, p
     size = w * h * 4
-    po = api.decodeBuffer p, datain.length, resolution.depth, size
+    po = api.decodeBuffer p, datain.length, size
     #api.updateBuffer frame_buffer, p, datain.length, resolution.w, resolution.h, resolution.depth
+    #api.destroyBuffer p
     # create buffer array and send back to main
     dataout = new Uint8Array Module.HEAP8.buffer, po, size
     # console.log dataout
@@ -36,16 +38,28 @@ wasm_update = (msg) ->
     msg.w = w
     msg.h = h
     postMessage msg, [msg.pixels]
+    #if flag isnt 0x0 or resolution.depth isnt 32
+    api.destroyBuffer po
     api.destroyBuffer p
-    if flag isnt 0x0 or resolution.depth isnt 32
-        api.destroyBuffer po
+
+#update_screen = () ->
+#    size = resolution.w * resolution.h * 4
+#    dataout = new Uint8Array Module.HEAP8.buffer, frame_buffer, size
+#    tmp = new Uint8Array size
+#    tmp.set dataout, 0
+#    postMessage tmp.buffer, [tmp.buffer]
+#    timeout = setTimeout(update_screen, 50)
 
 onmessage = (e) ->
     if e.data.depth
         resolution = e.data
         #api.destroyBuffer frame_buffer if frame_buffer
         #frame_buffer = api.createBuffer resolution.w * resolution.h * 4
-    #else if e.data.cleanup
+   # else if e.data.cleanup
     #    api.destroyBuffer frame_buffer if frame_buffer
+    #    clearTimeout(timeout)
+    #    timeout = undefined
     else
         wasm_update e.data
+        #if timeout is undefined
+        #    timeout = setTimeout(update_screen, 50)
