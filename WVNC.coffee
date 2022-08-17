@@ -188,24 +188,15 @@ class WVNC
 
     initConnection: (vncserver, params) ->
         #vncserver = "192.168.1.20:5901"
-        data = new Uint8Array vncserver.length + 3
+        data = new Uint8Array vncserver.length + 2
         data[0] = 32 # bbp
-        ###
-        flag:
-            0: raw data no compress
-            1: jpeg no compress
-            2: raw data compressed by zlib
-            3: jpeg data compressed by zlib
-        ###
-        data[1] = 2
-        data[2] = 50 # jpeg quality
+        data[1] = 50 # jpeg quality
         if params
             data[0] = params.bbp if params.bbp
-            data[1] = params.flag if params.flag
-            data[2] = params.quality if params.quality
+            data[1] = params.quality if params.quality
         ## rate in milisecond
 
-        data.set (new TextEncoder()).encode(vncserver), 3
+        data.set (new TextEncoder()).encode(vncserver), 2
         @socket.send(@buildCommand 0x01, data)
 
     sendPointEvent: (x, y, mask) ->
@@ -295,7 +286,7 @@ class WVNC
             when 0x83
                 w = data[1] | (data[2]<<8)
                 h = data[3] | (data[4]<<8)
-                depth = data[5]
+                depth = 32
                 @initCanvas w, h, depth
                 # status command for ack
                 @socket.send(@buildCommand 0x04, 1)

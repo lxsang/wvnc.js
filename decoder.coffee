@@ -9,8 +9,8 @@ Module.onRuntimeInitialized = () ->
     {
         createBuffer: Module.cwrap('create_buffer', 'number', ['number', 'number']),
         destroyBuffer: Module.cwrap('destroy_buffer', '', ['number']),
-        updateBuffer: Module.cwrap("update", 'number', ['number', 'number', 'number', 'number', 'number', 'number']),
-        decodeBuffer: Module.cwrap("decode",'number', ['number', 'number', 'number','number'] )
+        updateBuffer: Module.cwrap("update", 'number', ['number', 'number', 'number', 'number', 'number']),
+        decodeBuffer: Module.cwrap("decode",'number', ['number', 'number', 'number'] )
     }
 
 wasm_update = (msg) ->
@@ -19,7 +19,8 @@ wasm_update = (msg) ->
     y = datain[3] | (datain[4] << 8)
     w = datain[5] | (datain[6] << 8)
     h = datain[7] | (datain[8] << 8)
-    flag = datain[9]
+    flag = datain[9] & 0x01
+    bbp = datain[9] & 0xFE
     msg = {}
     msg.pixels = undefined
     msg.x = x
@@ -27,16 +28,10 @@ wasm_update = (msg) ->
     msg.w = w
     msg.h = h
     size = w * h * 4
+    return if size is 0
     tmp = new Uint8Array size
-    if flag is 0
-        tmp.set datain.subarray(10), 0 
-        msg.pixels = tmp.buffer
-        postMessage msg, [msg.pixels]
-        return
-
     p = api.createBuffer datain.length
     Module.HEAP8.set datain, p
-    
     po = api.decodeBuffer p, datain.length, size
     #api.updateBuffer frame_buffer, p, datain.length, resolution.w, resolution.h, resolution.depth
     #api.destroyBuffer p
@@ -46,8 +41,9 @@ wasm_update = (msg) ->
     tmp.set dataout, 0
     msg.pixels = tmp.buffer
     postMessage msg, [msg.pixels]
-    api.destroyBuffer po
     api.destroyBuffer p
+    if flag isnt 0x0 or bbp isnt 32
+        api.destroyBuffer po
 
 #update_screen = () ->
 #    size = resolution.w * resolution.h * 4
@@ -58,7 +54,7 @@ wasm_update = (msg) ->
 #    timeout = setTimeout(update_screen, 50)
 
 onmessage = (e) ->
-    if e.data.depth
+    if e.data.width
         resolution = e.data
         #api.destroyBuffer frame_buffer if frame_buffer
         #frame_buffer = api.createBuffer resolution.w * resolution.h * 4
