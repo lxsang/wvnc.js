@@ -25,8 +25,8 @@ dep:
 all: dep asm js
 
 asm:
-	emcc -o $(BUILDDIR)/wvnc_asm.js -I wasm/libjpeg/  wasm/decoder.c \
-	wasm/libjpeg/.libs/libjpeg.a \
+	emcc -o $(BUILDDIR)/wvnc_asm.js -I wasm/libjpeg-turbo/  -I wasm/libjpeg-turbo/build wasm/decoder.c \
+	wasm/libjpeg-turbo/build/libjpeg.a \
 	-O3 -s ALLOW_MEMORY_GROWTH=1  -s WASM=1 -s NO_EXIT_RUNTIME=1 -s \
 	'EXTRA_EXPORTED_RUNTIME_METHODS=["cwrap"]' 
 

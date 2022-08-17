@@ -24,8 +24,7 @@ EMSCRIPTEN_KEEPALIVE
 void destroy_buffer(uint8_t* p) {
   free(p);
 }
-
-static uint8_t * framebuffer = NULL;
+int decode_raw(uint8_t* in,int size, int depth, uint8_t* out);
 
 int decode_jpeg(uint8_t* in,int size_in, uint8_t* out)
 {
@@ -36,40 +35,26 @@ int decode_jpeg(uint8_t* in,int size_in, uint8_t* out)
     jpeg_mem_src(&cinfo, in, size_in);
     // check if the jpeg is valid
     int rc = jpeg_read_header(&cinfo, TRUE);
-	if (rc != 1) {
-		printf("Cannot read JPEG header");
-		return 0;
-    }
-    //cinfo.out_color_space = JCS_RGB;
+    cinfo.out_color_space = JCS_EXT_RGBA;
     //cinfo.dct_method = JDCT_ISLOW;
     jpeg_start_decompress(&cinfo);
     int width = cinfo.output_width;
 	int height = cinfo.output_height;
-    int osize = width*height*3;
-    int row_stride = width * 3;
+    int osize = width*height*4;
+    int row_stride = width * 4;
     //printf("width %d, height %d %d\n", width, height, cinfo.output_components);
-    uint8_t * tmp = (uint8_t*) malloc(osize);
+    //uint8_t * tmp = (uint8_t*) malloc(osize);
     uint8_t * line_buffer[1];
     int index;
     while( cinfo.output_scanline < height ){
-        line_buffer[0] = tmp +(cinfo.output_scanline) * row_stride;
+        line_buffer[0] = out +(cinfo.output_scanline) * row_stride;
         jpeg_read_scanlines(&cinfo, line_buffer, 1);
     }
     jpeg_finish_decompress(&cinfo);
     jpeg_destroy_decompress(&cinfo);
-    for(int j = 0; j < height; j++)
-    {
-        for(int i = 0; i < width; i++)
-        {
-            index = j*width*4 + i*4;
-            memcpy(out + index, tmp + j*width*3 + i*3, 3);
-            *(out + index + 3) = 255;
-        }
-    }
     //copy
     //memcpy(out, tmp, osize);
     //free
-    free(tmp);
     return osize;
 }
 

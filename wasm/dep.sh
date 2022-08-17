@@ -7,13 +7,32 @@ fi
 if [ -d "zlib" ]; then
     rm -r zlib
 fi
-wget http://www.ijg.org/files/jpegsrc.v9c.tar.gz
-mkdir libjpeg
-tar xvzf jpegsrc.v9c.tar.gz -C ./libjpeg --strip-components=1
-rm jpegsrc.v9c.tar.gz
-cd libjpeg
-emconfigure ./configure
+if [ -d "libjpeg-turbo" ]; then
+    rm -rf libjpeg-turbo
+fi
+#wget http://www.ijg.org/files/jpegsrc.v9c.tar.gz
+#mkdir libjpeg
+#tar xvzf jpegsrc.v9c.tar.gz -C ./libjpeg --strip-components=1
+#rm jpegsrc.v9c.tar.gz
+#cd libjpeg
+#emconfigure ./configure
+#emmake make
+
+git clone https://github.com/libjpeg-turbo/libjpeg-turbo
+git checkout 2.0.x
+
+# export LDFLAGS=" "
+cd libjpeg-turbo
+mkdir build
+cd build
+emcmake cmake -G"Unix Makefiles" \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DENABLE_SHARED=0 \
+        -DWITH_SIMD=0 -DENABLE_SHARED=0 \
+        -DCMAKE_C_FLAGS="-Wall -s ALLOW_MEMORY_GROWTH=1 " \
+        ../ ${1+"$@"}
 emmake make
+
 ## Using libjpeg-turbo
 #git clone https://github.com/libjpeg-turbo/libjpeg-turbo
 #mv libjpeg-turbo libjpeg
@@ -22,7 +41,7 @@ emmake make
 #cd build
 #emcmake cmake ../
 #emmake make
-cd ../
+#cd ../
 #echo "Preparing Zlib..."
 #wget https://zlib.net/zlib-1.2.12.tar.gz
 #mkdir zlib
@@ -36,4 +55,4 @@ cd ../
 #    sed -i -e 's/ARFLAGS=-o/ARFLAGS=rc/g' Makefile
 #fi
 # TODO modify make file using sed if macos
-emmake make
+
