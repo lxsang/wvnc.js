@@ -29,7 +29,6 @@ wasm_update = (msg) ->
     size = w * h * 4
     tmp = new Uint8Array size
     if flag is 0
-        console.log "raw data detected"
         tmp.set datain.subarray(10), 0 
         msg.pixels = tmp.buffer
         postMessage msg, [msg.pixels]
