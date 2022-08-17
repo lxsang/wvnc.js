@@ -24,19 +24,27 @@
     w = datain[5] | (datain[6] << 8);
     h = datain[7] | (datain[8] << 8);
     flag = datain[9];
-    p = api.createBuffer(datain.length);
-    Module.HEAP8.set(datain, p);
-    size = w * h * 4;
-    po = api.decodeBuffer(p, datain.length, size);
-    dataout = new Uint8Array(Module.HEAP8.buffer, po, size);
     msg = {};
-    tmp = new Uint8Array(size);
-    tmp.set(dataout, 0);
-    msg.pixels = tmp.buffer;
+    msg.pixels = void 0;
     msg.x = x;
     msg.y = y;
     msg.w = w;
     msg.h = h;
+    size = w * h * 4;
+    tmp = new Uint8Array(size);
+    if (flag === 0) {
+      console.log("raw data detected");
+      tmp.set(datain.subarray(10), 0);
+      msg.pixels = tmp.buffer;
+      postMessage(msg, [msg.pixels]);
+      return;
+    }
+    p = api.createBuffer(datain.length);
+    Module.HEAP8.set(datain, p);
+    po = api.decodeBuffer(p, datain.length, size);
+    dataout = new Uint8Array(Module.HEAP8.buffer, po, size);
+    tmp.set(dataout, 0);
+    msg.pixels = tmp.buffer;
     postMessage(msg, [msg.pixels]);
     api.destroyBuffer(po);
     return api.destroyBuffer(p);

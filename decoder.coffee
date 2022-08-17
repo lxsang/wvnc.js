@@ -20,25 +20,33 @@ wasm_update = (msg) ->
     w = datain[5] | (datain[6] << 8)
     h = datain[7] | (datain[8] << 8)
     flag = datain[9]
+    msg = {}
+    msg.pixels = undefined
+    msg.x = x
+    msg.y = y
+    msg.w = w
+    msg.h = h
+    size = w * h * 4
+    tmp = new Uint8Array size
+    if flag is 0
+        console.log "raw data detected"
+        tmp.set datain.subarray(10), 0 
+        msg.pixels = tmp.buffer
+        postMessage msg, [msg.pixels]
+        return
+
     p = api.createBuffer datain.length
     Module.HEAP8.set datain, p
-    size = w * h * 4
+    
     po = api.decodeBuffer p, datain.length, size
     #api.updateBuffer frame_buffer, p, datain.length, resolution.w, resolution.h, resolution.depth
     #api.destroyBuffer p
     # create buffer array and send back to main
     dataout = new Uint8Array Module.HEAP8.buffer, po, size
     # console.log dataout
-    msg = {}
-    tmp = new Uint8Array size
     tmp.set dataout, 0
     msg.pixels = tmp.buffer
-    msg.x = x
-    msg.y = y
-    msg.w = w
-    msg.h = h
     postMessage msg, [msg.pixels]
-    #if flag isnt 0x0 or resolution.depth isnt 32
     api.destroyBuffer po
     api.destroyBuffer p
 

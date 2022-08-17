@@ -90,7 +90,7 @@ void update_buffer(uint8_t* fb, uint8_t* data, int x, int y, int w, int h, int b
 EMSCRIPTEN_KEEPALIVE
 uint8_t* decode(uint8_t* data, int data_size, int size_out)
 {
-    uint8_t* encoded_data = data + 9;
+    uint8_t* encoded_data = data + 10;
     uint8_t* decoded_data = NULL;
     int ret = 0;
     decoded_data = (uint8_t*) malloc(size_out);
@@ -110,6 +110,7 @@ int update(uint8_t* fb, uint8_t* data, int data_size, int bw, int bh)
     y = data[3] | (data[4] << 8);
     w = data[5] | (data[6] << 8);
     h = data[7] | (data[8] << 8);
+    flag = data[9];
     //printf("x %d y %d w %d h %d flag %d\n",x,y,w,h,flag);
     uint8_t* decoded_data = decode(data, data_size, w*h*4);
     if(decoded_data)
